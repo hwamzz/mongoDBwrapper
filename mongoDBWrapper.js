@@ -1,7 +1,4 @@
 const mongo = require('mongoose')
-const express = require('express')
-,     bodyParser = require('body-parser')
-const app = express()
 // Collection Schemas
 const WinsSchema = require('./models/WinsSchema')
 const DamageSchema = require('./models/DamageSchema')
@@ -311,39 +308,3 @@ class Towers {
         }
     }
 }
-
-app.use(bodyParser.json())
-
-app.post("/", async (request, response) => {
-    const collection = request.body.Collection
-    const func = request.body.Operation
-    const body = request.body.UserId
-    let query
-
-    async function handleCollection(func, collection, body) {
-        const classToUse = eval(`new ${collection}(${body})`)
-        const methodToUse = `${func}${collection}()`
-        const abc = await classToUse
-        console.log(eval(`${abc}.${methodToUse}`))
-        query = eval(`${abc}.${methodToUse}`)
-        console.log(query)
-        return query
-    }
-    
-    switch (collection) {
-        case "Wins":
-        case "Damage":
-        case "Score":
-        case "Waves":
-        case "Code":
-        case "Towers":
-            handleCollection(func, collection, body);
-            break;
-        default:
-            console.log("Invalid collection:", collection);
-    }
-
-    return response.status(200).send(query)
-})
-
-app.listen(3000 || 3001)
