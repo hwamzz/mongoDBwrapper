@@ -1,0 +1,18 @@
+{
+  "name": "dbtesting",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "env-cmd -f ./config/auth.env node mongoDBWrapper.js"
+  },
+  "author": "Hwamzz",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "env-cmd": "^10.1.0",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3"
+  }
+}
