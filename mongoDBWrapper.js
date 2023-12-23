@@ -1,4 +1,7 @@
 const mongo = require('mongoose')
+const express = require('express')
+,     bodyParser = require('body-parser')
+const app = express()
 // Collection Schemas
 const WinsSchema = require('./models/WinsSchema')
 const DamageSchema = require('./models/DamageSchema')
@@ -14,8 +17,8 @@ mongo.connect(mongoConnectionString).then(() => console.log('MongoDB connected s
 class Wins {
     constructor(UserId, Wins, cache) {
         this.UserId = UserId;
-        this.Wins = Wins || 0;
-        this.cache = cache || 0;
+        this.Wins = (Wins) ? (Wins) : (0);
+        this.cache = cache;
     }
 
     async getWins() {
@@ -30,11 +33,6 @@ class Wins {
                 return this.cache
             }
             else if (!data) {
-                new WinsSchema({
-                    UserId: this.UserId,
-                    Wins: 0
-                })
-
                 this.cache = 0
                 return this.cache
             }
@@ -44,19 +42,37 @@ class Wins {
     }
 
     async setWins() {
-        try {
-            const data = await WinsSchema.findOne({
-                UserId: this.UserId
-            })
-
-            const oldWins = (data.Wins) ? (data.Wins) : (0)
-            const updatedWins = oldWins + this.Wins
-            await WinsSchema.findOneAndUpdate({ UserId: this.UserId }, { Wins: oldWins + this.Wins }, { new: true })
+        if (this.cache) {
+            const updatedWins = this.cache + this.Wins
+            await WinsSchema.findOneAndUpdate({ UserId: this.UserId }, { Wins: updatedWins }, { new: true })
 
             this.cache = updatedWins
             return "Success"
-        } catch (error) {
-            return error
+        } else {
+            try {
+                const data = await WinsSchema.findOne({
+                    UserId: this.UserId
+                })
+
+                if (data) {
+                    const oldWins = (data.Wins) ? (data.Wins) : (0)
+                    const updatedWins = oldWins + this.Wins
+                    await WinsSchema.findOneAndUpdate({ UserId: this.UserId }, { Wins: updatedWins }, { new: true })
+    
+                    this.cache = updatedWins
+                    return "Success"
+                } else if (!data) {
+                    new WinsSchema({
+                        UserId: this.UserId,
+                        Wins: this.Wins
+                    }).save()
+    
+                    this.cache = this.Wins
+                    return "Success"
+                }
+            } catch (error) {
+                return error
+            }
         }
     }
 }
@@ -64,7 +80,7 @@ class Wins {
 class Damage {
     constructor(UserId, Damage, cache) {
         this.UserId = UserId;
-        this.Damage = Damage;
+        this.Damage = (Damage) ? (Damage) : (0);
         this.cache = cache;
     }
 
@@ -80,11 +96,6 @@ class Damage {
                 return this.cache
             }
             else if (!data) {
-                new DamageSchema({
-                    UserId: this.UserId,
-                    Damage: 0
-                })
-
                 this.cache = 0
                 return this.cache
             }
@@ -94,19 +105,37 @@ class Damage {
     }
 
     async setDamage() {
-        try {
-            const data = await DamageSchema.findOne({
-                UserId: this.UserId
-            })
-
-            const oldDamage = (data.Damage) ? (data.Damage) : (0)
-            const updatedDamage = oldDamage + this.Damage
-            await DamageSchema.findOneAndUpdate({ UserId: this.UserId }, { Damage: oldDamage + this.Damage }, { new: true })
+        if (this.cache) {
+            const updatedDamage = this.cache + this.Wins
+            await DamageSchema.findOneAndUpdate({ UserId: this.UserId }, { Damage: updatedDamage }, { new: true })
 
             this.cache = updatedDamage
             return "Success"
-        } catch (error) {
-            return error
+        } else {
+            try {
+                const data = await DamageSchema.findOne({
+                    UserId: this.UserId
+                })
+
+                if (data) {
+                    const oldDamage = (data.Damage) ? (data.Damage) : (0)
+                    const updatedDamage = oldDamage + this.Damage
+                    await DamageSchema.findOneAndUpdate({ UserId: this.UserId }, { Damage: updatedDamage }, { new: true })
+        
+                    this.cache = updatedDamage
+                    return "Success"
+                } else if (!data) {
+                    new DamageSchema({
+                        UserId: this.UserId,
+                        Damage: this.Damage
+                    }).save()
+    
+                    this.cache = this.Damage
+                    return "Success"
+                }
+            } catch (error) {
+                return error
+            }
         }
     }
 }
@@ -114,7 +143,7 @@ class Damage {
 class Score {
     constructor(UserId, Score, cache) {
         this.UserId = UserId;
-        this.Score = Score;
+        this.Score = (Score) ? (Score) : (0);
         this.cache = cache;
     }
 
@@ -130,11 +159,6 @@ class Score {
                 return this.cache
             }
             else if (!data) {
-                new ScoreSchema({
-                    UserId: this.UserId,
-                    Score: 0
-                })
-
                 this.cache = 0
                 return this.cache
             }
@@ -144,19 +168,37 @@ class Score {
     }
 
     async setScore() {
-        try {
-            const data = await ScoreSchema.findOne({
-                UserId: this.UserId
-            })
-
-            const oldScore = (data.Score) ? (data.Score) : (0)
-            const updatedScore = oldScore + this.Score
-            await HighScoreSchema.findOneAndUpdate({ UserId: this.UserId }, { Score: oldScore + this.Score }, { new: true })
-
+        if (this.cache) {
+            const updatedScore = this.cache + this.Wins
+            await HighScoreSchema.findOneAndUpdate({ UserId: this.UserId }, { Score: updatedScore }, { new: true })
+        
             this.cache = updatedScore
             return "Success"
-        } catch (error) {
-            return error
+        } else {
+            try {
+                const data = await HighScoreSchema.findOne({
+                    UserId: this.UserId
+                })
+
+                if (data) {
+                    const oldScore = (data.Score) ? (data.Score) : (0)
+                    const updatedScore = oldScore + this.Score
+                    await HighScoreSchema.findOneAndUpdate({ UserId: this.UserId }, { Score: updatedScore }, { new: true })
+        
+                    this.cache = updatedScore
+                    return "Success"
+                } else if (!data) {
+                    new HighScoreSchema({
+                        UserId: this.UserId,
+                        Score: this.Score
+                    }).save()
+    
+                    this.cache = this.Score
+                    return "Success"
+                }
+            } catch (error) {
+                return error
+            }
         }
     }
 }
@@ -164,7 +206,7 @@ class Score {
 class Waves {
     constructor(UserId, Waves, cache) {
         this.UserId = UserId;
-        this.Waves = Waves;
+        this.Waves = (Waves) ? (Waves) : (0);
         this.cache = cache;
     }
 
@@ -180,11 +222,6 @@ class Waves {
                 return this.cache
             }
             else if (!data) {
-                new WavesSchema({
-                    UserId: this.UserId,
-                    Waves: 0
-                })
-
                 this.cache = 0
                 return this.cache
             }
@@ -194,19 +231,37 @@ class Waves {
     }
 
     async setWaves() {
-        try {
-            const data = await WavesSchema.findOne({
-                UserId: this.UserId
-            })
-
-            const oldWaves = (data.Waves) ? (data.Waves) : (0)
-            const updatedWaves = oldWaves + this.Waves
-            await WavesSchema.findOneAndUpdate({ UserId: this.UserId }, { Waves: oldWaves + this.Waves }, { new: true })
-
+        if (this.cache) {
+            const updatedWaves = this.cache + this.Waves
+            await WavesSchema.findOneAndUpdate({ UserId: this.UserId }, { Waves: updatedWaves }, { new: true })
+        
             this.cache = updatedWaves
             return "Success"
-        } catch (error) {
-            return error
+        } else {
+            try {
+                const data = await WavesSchema.findOne({
+                    UserId: this.UserId
+                })
+
+                if (data) {
+                    const oldWaves = (data.Waves) ? (data.Waves) : (0)
+                    const updatedWaves = oldWaves + this.Waves
+                    await WavesSchema.findOneAndUpdate({ UserId: this.UserId }, { Waves: updatedWaves }, { new: true })
+        
+                    this.cache = updatedWaves
+                    return "Success"
+                } else if (!data) {
+                    new WavesSchema({
+                        UserId: this.UserId,
+                        Waves: this.Waves
+                    }).save()
+
+                    this.cache = this.Waves
+                    return "Success"
+                }
+            } catch (error) {
+                return error
+            }
         }
     }
 }
@@ -279,14 +334,7 @@ class Towers {
                 return this.cache
             }
             else if (!data) {
-                new TowerIdSchema({
-                    TowerId: this.TowerId,
-                    Skin: this.Skin,
-                    Type: this.Type
-                })
-
-                this.cache = [this.Skin, this.Type]
-                return this.cache
+                return "Not found"
             }
         } catch (error) {
             return error
@@ -299,9 +347,19 @@ class Towers {
                 TowerId: this.TowerId
             })
 
-            await WavesSchema.findOneAndUpdate({ TowerId: this.TowerId }, { Skin: this.Skin, Type: this.Type }, { new: true })
+            if (data) {
+                await WavesSchema.findOneAndUpdate({ TowerId: this.TowerId }, { Skin: this.Skin, Type: this.Type }, { new: true })
+            } else {
+                new TowerIdSchema({
+                    TowerId: this.TowerId,
+                    Skin: this.Skin,
+                    Type: this.Type
+                }).save()
 
-            this.cache = updatedWaves
+                this.cache = [this.Skin, this.Type]
+            }
+
+            this.cache = [this.Skin, this.Type]
             return "Success"
         } catch (error) {
             return error
